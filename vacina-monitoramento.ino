@@ -4,8 +4,8 @@
 #include "addons/RTDBHelper.h"
 #include "time.h"
 
-#define WIFI_SSID "Multilaser"
-#define WIFI_PASSWORD "eletro123"
+#define WIFI_SSID "WIFI_SSID"
+#define WIFI_PASSWORD "WIFI_PASSWORD"
 #define API_KEY "AIzaSyAcWdnO4bmLH15I6RaVJtP-hA5jFzQ8QJ8"
 #define DATABASE_URL "https://esp32-firebase-temp-31c09-default-rtdb.firebaseio.com/"
 #define CONTAINER_ID "container-id-1"
