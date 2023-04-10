@@ -4,7 +4,7 @@
 #include <esp_now.h>
 
 #define CONTAINER_ID "CONTAINER-ID-1"
-#define DELAY 5000
+#define DELAY 1000
 
 typedef struct struct_message {
   float temp;
