@@ -5,12 +5,14 @@
 #include "addons/TokenHelper.h"
 #include "addons/RTDBHelper.h"
 #include "time.h"
+#include <TimeLib.h>
 
 #define WIFI_SSID "Multilaser"
 #define WIFI_PASS "eletro123"
 #define API_KEY "AIzaSyAcWdnO4bmLH15I6RaVJtP-hA5jFzQ8QJ8"
 #define DATABASE_URL "https://esp32-firebase-temp-31c09-default-rtdb.firebaseio.com/"
 #define ARRAY_SIZE 999
+#define PROJECT_ID "esp32-firebase-temp-31c09"
 
 FirebaseData fbdo;
 FirebaseAuth auth;
@@ -42,6 +44,21 @@ unsigned long getEpochTime() {
   }
   time(&now);
   return now;
+}
+
+String epochTimeToString(unsigned long epochTime) {
+  // Configurar o valor do tempo
+  setTime(epochTime);
+  
+  // Obter os componentes da data
+  int dia = day();
+  int mes = month();
+  int ano = year();
+  
+  // Construir a string de data no formato desejado (dia/mês/ano)
+  String data = String(dia) + "/" + String(mes) + "/" + String(ano);
+  
+  return data;
 }
 
 void initWiFi() {
@@ -77,6 +94,20 @@ void onReceive(const uint8_t *mac_addr, const uint8_t *data, int len) {
 void sendDataToFirebase() {
     json.set("temperature", String(myDatas[sendCount].temp));
     json.set("timestamp", String(myDatas[sendCount].timestamp));
+
+    String currentDate = epochTimeToString(myDatas[sendCount].timestamp);
+    String documentPath = myDatas[sendCount].id;
+
+    FirebaseJson content;
+    content.set("fields/temperature/doubleValue", String(myDatas[sendCount].temp).c_str());
+    content.set("fields/timestamp/doubleValue", String(myDatas[sendCount].timestamp).c_str());
+    content.set("fields/date/stringValue", String(currentDate).c_str());
+
+    if(Firebase.Firestore.createDocument(&fbdo, PROJECT_ID, "",  documentPath.c_str(),  content.raw())){
+      Serial.println("Document Created in Firestore");
+    } else {
+      Serial.println("Error: " + fbdo.errorReason());
+    }
 
     if(Firebase.RTDB.setJSON(&fbdo, myDatas[sendCount].id, &json)) {
       Serial.printf("Data Updated: [%s] - Temperatura: %f\n", myDatas[sendCount].id.c_str(), myDatas[sendCount].temp);

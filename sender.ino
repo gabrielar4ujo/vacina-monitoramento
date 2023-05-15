@@ -3,8 +3,8 @@
 #include <esp_wifi.h>
 #include <esp_now.h>
 
-#define CONTAINER_ID "CONTAINER-ID-1"
-#define DELAY 1000
+#define CONTAINER_ID "container-id-1"
+#define DELAY 5000
 
 typedef struct struct_message {
   float temp;
@@ -14,7 +14,7 @@ typedef struct struct_message {
 struct_message data;
 constexpr char WIFI_SSID[] = "Multilaser";
 
-constexpr uint8_t ESP_NOW_RECEIVER[] = { 0x84, 0xcc, 0xa8, 0x64, 0xc6, 0xcc };
+constexpr uint8_t ESP_NOW_RECEIVER[] = { 0x34, 0x86, 0x5D, 0xFF, 0x38, 0x48 };
 esp_now_peer_info_t peerInfo;
 uint32_t last = 0;
 
