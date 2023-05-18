@@ -99,8 +99,8 @@ void sendDataToFirebase() {
     String documentPath = myDatas[sendCount].id;
 
     FirebaseJson content;
-    content.set("fields/temperature/doubleValue", String(myDatas[sendCount].temp).c_str());
-    content.set("fields/timestamp/doubleValue", String(myDatas[sendCount].timestamp).c_str());
+    content.set("fields/temperature/stringValue", String(myDatas[sendCount].temp).c_str());
+    content.set("fields/timestamp/stringValue", String(myDatas[sendCount].timestamp).c_str());
     content.set("fields/date/stringValue", String(currentDate).c_str());
 
     if(Firebase.Firestore.createDocument(&fbdo, PROJECT_ID, "",  documentPath.c_str(),  content.raw())){
