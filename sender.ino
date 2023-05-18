@@ -2,9 +2,18 @@
 #include <WiFi.h>
 #include <esp_wifi.h>
 #include <esp_now.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
-#define CONTAINER_ID "container-id-1"
-#define DELAY 5000
+// Define o pino ao qual o sensor de temperatura está conectado
+#define ONE_WIRE_BUS 32
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+
+#define CONTAINER_ID "refrigerador-2"
+#define DELAY 1000
 
 typedef struct struct_message {
   float temp;
@@ -39,12 +48,6 @@ void initWiFi() {
     esp_wifi_set_promiscuous(false);
 }
 
-float generateRandomData() {
-  int randomNumber = random(1024);
-  float randomTemp = (float)randomNumber / 10.0;
-  return randomTemp;
-}
-
 void initEspNow() {
     if (esp_now_init() != ESP_OK) {
         Serial.println("ESP NOW failed to initialize");
@@ -61,22 +64,32 @@ void initEspNow() {
     }
 }
 
+float getCurrentTemp() {
+  sensors.requestTemperatures(); 
+  float temperaturaC = sensors.getTempCByIndex(0);
+
+  return temperaturaC;
+}
+
 void setup() {
     Serial.begin(115200);
 
     initWiFi();
     initEspNow();
+    sensors.begin();
 
     data.id = CONTAINER_ID; 
 }
 
 void loop() {
     if (millis() - last > DELAY) {
-      data.temp = generateRandomData();
+      float readTemp =  getCurrentTemp();
+
+      data.temp = (float)readTemp;
+      Serial.printf("Temp: %f\n", readTemp);
 
       esp_now_send(ESP_NOW_RECEIVER, (uint8_t *) &data, sizeof(data));
       
-      Serial.printf("Temp: %f\n", data.temp);
       Serial.printf("Id: %s\n", data.id.c_str());
       Serial.printf("Sent to channel: %u\n\n", WiFi.channel());
       last = millis();
